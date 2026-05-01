@@ -22,10 +22,6 @@ window {
   border-right: 1px solid {{border}};
 }
 
-.cal-header {
-  /* flex handled by GTK box */
-}
-
 .cal-month {
   font-size: 14px;
   font-weight: 600;
@@ -48,6 +44,66 @@ window {
   color: {{accent}};
   background: none;
   box-shadow: none;
+}
+
+/* ── Dropdowns ── */
+
+.cal-dropdown > button,
+.cal-dropdown > button:hover,
+.cal-dropdown > button:active,
+.cal-dropdown > button:focus {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  border-radius: 0;
+  padding: 0 2px;
+  min-height: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: {{bright}};
+}
+
+.cal-dropdown > button:hover {
+  color: {{accent}};
+}
+
+.cal-dropdown > button image {
+  color: {{muted}};
+  -gtk-icon-size: 12px;
+  margin-left: 2px;
+}
+
+popover.menu > contents {
+  padding: 4px 0;
+  background: {{bg}};
+  border: 1px solid {{border}};
+  border-radius: 0;
+}
+
+popover.menu listview {
+  background: transparent;
+}
+
+popover.menu listview row {
+  padding: 3px 14px;
+  border-radius: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  color: {{text}};
+}
+
+popover.menu listview row:hover {
+  background: {{border}};
+  color: {{bright}};
+}
+
+popover.menu listview row:selected {
+  background: transparent;
+  color: {{accent}};
 }
 
 .sep {

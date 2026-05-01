@@ -7,6 +7,13 @@ import type { AccountConfig } from "./types.js";
 import { CONFIG_DIR } from "./cache.js";
 
 const SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"];
+const LOCALHOST_BASE_URL = "http://localhost";
+const SERVER_LISTEN_HOST = "127.0.0.1";
+const HTTP_OK = 200;
+const CONTENT_TYPE_HTML = "text/html";
+const AUTH_COMPLETE_HTML = "<html><body><p>Auth complete. Close this tab.</p></body></html>";
+const OAUTH_ACCESS_TYPE = "offline";
+const OAUTH_PROMPT = "consent";
 
 function tokenPath(accountId: string): string {
   return path.join(CONFIG_DIR, `token-${accountId}.json`);
@@ -16,15 +23,18 @@ export async function getAuthClient(account: AccountConfig, credentialsPath: str
   const credentials = JSON.parse(fs.readFileSync(credentialsPath, "utf8"));
   const { client_id, client_secret, redirect_uris } = credentials.installed ?? credentials.web;
 
-  const client = new google.auth.OAuth2(client_id, client_secret, "http://localhost");
+  const client = new google.auth.OAuth2(client_id, client_secret, LOCALHOST_BASE_URL);
 
   const tp = tokenPath(account.id);
   if (fs.existsSync(tp)) {
     client.setCredentials(JSON.parse(fs.readFileSync(tp, "utf8")));
     client.on("tokens", (tokens) => {
-      const existing = fs.existsSync(tp)
-        ? JSON.parse(fs.readFileSync(tp, "utf8"))
-        : {};
+      let existing: object;
+      if (fs.existsSync(tp)) {
+        existing = JSON.parse(fs.readFileSync(tp, "utf8"));
+      } else {
+        existing = {};
+      }
       fs.writeFileSync(tp, JSON.stringify({ ...existing, ...tokens }));
     });
     return client;
@@ -40,14 +50,17 @@ async function runOAuthFlow(
 ): Promise<Auth.OAuth2Client> {
   return new Promise((resolve, reject) => {
     const server = http.createServer(async (req, res) => {
-      const url = new URL(req.url!, "http://localhost");
+      const url = new URL(req.url!, LOCALHOST_BASE_URL);
       const code = url.searchParams.get("code");
 
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end("<html><body><p>Auth complete. Close this tab.</p></body></html>");
+      res.writeHead(HTTP_OK, { "Content-Type": CONTENT_TYPE_HTML });
+      res.end(AUTH_COMPLETE_HTML);
       server.close();
 
-      if (!code) return reject(new Error("No code in OAuth redirect"));
+      if (!code) {
+        reject(new Error("No code in OAuth redirect"));
+        return;
+      }
 
       try {
         const { tokens } = await client.getToken(code);
@@ -63,14 +76,14 @@ async function runOAuthFlow(
       }
     });
 
-    server.listen(0, "127.0.0.1", () => {
+    server.listen(0, SERVER_LISTEN_HOST, () => {
       const port = (server.address() as { port: number }).port;
-      (client as unknown as { redirectUri: string }).redirectUri = `http://localhost:${port}`;
+      (client as unknown as { redirectUri: string }).redirectUri = `${LOCALHOST_BASE_URL}:${port}`;
 
       const authUrl = client.generateAuthUrl({
-        access_type: "offline",
+        access_type: OAUTH_ACCESS_TYPE,
         scope: SCOPES,
-        prompt: "consent",
+        prompt: OAUTH_PROMPT,
       });
 
       console.error(`[oauth] Opening browser for account "${account.id}"...`);

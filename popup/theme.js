@@ -1,5 +1,13 @@
 import GLib from "gi://GLib";
 
+const THEME_FILE = GLib.get_home_dir() + "/.config/omarchy/current/theme/colors.toml";
+
+const OPACITY_BG = 0.98;
+const OPACITY_BORDER = 0.12;
+const OPACITY_MUTED = 0.25;
+const OPACITY_DIM = 0.45;
+const OPACITY_TEXT = 0.85;
+
 const DEFAULTS = {
   foreground: "#cdd6f4",
   background: "#1e1e2e",
@@ -14,25 +22,26 @@ const DEFAULTS = {
 };
 
 export function loadTheme() {
-  const path = GLib.get_home_dir() + "/.config/omarchy/current/theme/colors.toml";
-  const [ok, bytes] = GLib.file_get_contents(path);
+  const [ok, bytes] = GLib.file_get_contents(THEME_FILE);
 
   const c = { ...DEFAULTS };
   if (ok) {
     const text = new TextDecoder().decode(bytes);
     for (const line of text.split("\n")) {
       const m = line.match(/^(\w+)\s*=\s*"(#[0-9a-fA-F]{6})"/);
-      if (m) c[m[1]] = m[2];
+      if (m) {
+        c[m[1]] = m[2];
+      }
     }
   }
 
   // border/muted/dim derived from foreground opacity — works on any theme
   return {
-    bg:         hexToRgba(c.background, 0.98),
-    border:     hexToRgba(c.foreground, 0.12),
-    muted:      hexToRgba(c.foreground, 0.25),
-    dim:        hexToRgba(c.foreground, 0.45),
-    text:       hexToRgba(c.foreground, 0.85),
+    bg:         hexToRgba(c.background, OPACITY_BG),
+    border:     hexToRgba(c.foreground, OPACITY_BORDER),
+    muted:      hexToRgba(c.foreground, OPACITY_MUTED),
+    dim:        hexToRgba(c.foreground, OPACITY_DIM),
+    text:       hexToRgba(c.foreground, OPACITY_TEXT),
     bright:     c.foreground,
     accent:     c.accent,
     accent_fg:  c.background,

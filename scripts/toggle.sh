@@ -12,3 +12,4 @@ if [[ -f "$PID_FILE" ]]; then
 fi
 
 LD_PRELOAD=/usr/lib/libgtk4-layer-shell.so gjs -m "$HOME/Projects/waybar-calendar/popup/main.js" &
+echo $! > "$PID_FILE"

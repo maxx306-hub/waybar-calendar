@@ -4,6 +4,7 @@ import GLib from "gi://GLib";
 
 const DAY_NAMES = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 const MONTH_NAMES = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+const UPCOMING_EVENT_COUNT = 4;
 
 export const EventsPanel = GObject.registerClass(
 class EventsPanel extends Gtk.Box {
@@ -122,7 +123,9 @@ class EventsPanel extends Gtk.Box {
       if (inner) {
         let w = inner.get_first_child?.();
         while (w) {
-          if (w instanceof Gtk.DrawingArea) w.set_draw_func(null);
+          if (w instanceof Gtk.DrawingArea) {
+            w.set_draw_func(null);
+          }
           w = w.get_next_sibling?.();
         }
       }
@@ -142,7 +145,7 @@ class EventsPanel extends Gtk.Box {
       events = this._events
         .filter(e => e.start.slice(0, 10) >= todayIso)
         .sort((a, b) => a.start.localeCompare(b.start))
-        .slice(0, 4);
+        .slice(0, UPCOMING_EVENT_COUNT);
       this._title.set_label("upcoming");
     }
 
@@ -161,7 +164,9 @@ class EventsPanel extends Gtk.Box {
   _buildRow(ev) {
     const btn = new Gtk.Button();
     btn.add_css_class("event-row");
-    if (ev.id === this._activeEventId) btn.add_css_class("active");
+    if (ev.id === this._activeEventId) {
+      btn.add_css_class("active");
+    }
 
     const inner = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8 });
 
@@ -178,6 +183,7 @@ class EventsPanel extends Gtk.Box {
     });
     inner.append(dot);
 
+    // ellipsize: 3 = Pango.EllipsizeMode.END
     const title = new Gtk.Label({ label: ev.summary, xalign: 0, hexpand: true, ellipsize: 3 });
     title.add_css_class("event-title");
     inner.append(title);
@@ -256,7 +262,9 @@ function formatDayLabel(year, month, day) {
 }
 
 function formatTime(isoStart, allDay) {
-  if (allDay) return "all day";
+  if (allDay) {
+    return "all day";
+  }
   const d = new Date(isoStart);
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
 }

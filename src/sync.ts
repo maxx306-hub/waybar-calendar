@@ -1,10 +1,17 @@
 import { execSync } from "child_process";
 import { getAuthClient } from "./oauth.js";
 import { fetchCalendars, fetchEvents } from "./google-api.js";
-import { readConfig, writeCache, ensureDirs } from "./cache.js";
+import { readConfig, writeCache, ensureDirs, DEFAULT_SYNC_INTERVAL_MINUTES } from "./cache.js";
 import type { CalEvent, EventsCache } from "./types.js";
 
-const once = process.argv.includes("--once");
+const ONCE_FLAG = "--once";
+const DAYS_PAST = 7;
+const DAYS_FUTURE = 60;
+const SECONDS_PER_MINUTE = 60;
+const MS_PER_SECOND = 1000;
+const WAYBAR_SIGNAL_CMD = "pkill -RTMIN+11 waybar";
+
+const once = process.argv.includes(ONCE_FLAG);
 
 async function sync(): Promise<void> {
   const config = readConfig();
@@ -16,9 +23,9 @@ async function sync(): Promise<void> {
 
   const now = new Date();
   const timeMin = new Date(now);
-  timeMin.setDate(timeMin.getDate() - 7);
+  timeMin.setDate(timeMin.getDate() - DAYS_PAST);
   const timeMax = new Date(now);
-  timeMax.setDate(timeMax.getDate() + 60);
+  timeMax.setDate(timeMax.getDate() + DAYS_FUTURE);
 
   const allEvents: CalEvent[] = [];
   const allCalendars: EventsCache["calendars"] = [];
@@ -52,7 +59,7 @@ async function sync(): Promise<void> {
   console.error(`[sync] Done. ${allEvents.length} events from ${accountMetas.length} accounts.`);
 
   try {
-    execSync("pkill -RTMIN+11 waybar", { stdio: "ignore" });
+    execSync(WAYBAR_SIGNAL_CMD, { stdio: "ignore" });
   } catch {
     // waybar may not be running
   }
@@ -67,7 +74,7 @@ async function main(): Promise<void> {
   }
 
   const config = readConfig();
-  const intervalMs = (config.syncIntervalMinutes ?? 15) * 60 * 1000;
+  const intervalMs = (config.syncIntervalMinutes ?? DEFAULT_SYNC_INTERVAL_MINUTES) * SECONDS_PER_MINUTE * MS_PER_SECOND;
 
   await sync();
   setInterval(sync, intervalMs);

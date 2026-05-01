@@ -2,6 +2,17 @@ import GObject from "gi://GObject";
 import Gtk from "gi://Gtk?version=4.0";
 
 const DAY_LABELS = ["mo", "tu", "we", "th", "fr", "sa", "su"];
+const MONTHS = [
+  "january", "february", "march", "april", "may", "june",
+  "july", "august", "september", "october", "november", "december",
+];
+
+const GRID_TOTAL_CELLS = 42;
+const CELL_HEIGHT_PX = 36;
+const SEP_CHAR_COUNT = 34;
+const MAX_EVENT_DOTS = 3;
+const YEAR_RANGE = 15;
+const YEAR_COUNT = YEAR_RANGE * 2 + 1;
 
 export const CalendarGrid = GObject.registerClass(
 class CalendarGrid extends Gtk.Box {
@@ -12,6 +23,7 @@ class CalendarGrid extends Gtk.Box {
     this._viewMonth = null;
     this._selectedDay = null;
     this._events = [];
+    this._updatingDropdowns = false;
 
     this._buildHeader();
     this._buildSep();
@@ -23,30 +35,56 @@ class CalendarGrid extends Gtk.Box {
   }
 
   _buildHeader() {
-    const box = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 0 });
+    const box = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 6 });
 
-    this._monthLabel = new Gtk.Label({ label: "", xalign: 0, hexpand: true });
-    this._monthLabel.add_css_class("cal-month");
-    box.append(this._monthLabel);
+    const monthModel = Gtk.StringList.new(MONTHS);
+    this._monthDrop = new Gtk.DropDown({ model: monthModel, selected: 0 });
+    this._monthDrop.add_css_class("cal-dropdown");
+    this._monthDrop.set_hexpand(true);
+    box.append(this._monthDrop);
 
-    const navBox = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 2 });
+    const now = new Date();
+    this._yearBase = now.getFullYear() - YEAR_RANGE;
+    this._yearCount = YEAR_COUNT;
+    const yearStrings = Array.from({ length: this._yearCount }, (_, i) => String(this._yearBase + i));
+    const yearModel = Gtk.StringList.new(yearStrings);
+    this._yearDrop = new Gtk.DropDown({ model: yearModel, selected: YEAR_RANGE });
+    this._yearDrop.add_css_class("cal-dropdown");
+    box.append(this._yearDrop);
 
-    this._prevBtn = new Gtk.Button({ label: "‹" });
-    this._prevBtn.add_css_class("nav-btn");
-    this._prevBtn.connect("clicked", () => this._navigate(-1));
-    navBox.append(this._prevBtn);
+    this._monthDrop.connect("notify::selected", () => {
+      if (this._updatingDropdowns) {
+        return;
+      }
+      this._selectedDay = null;
+      this.setMonth(this._viewYear, this._monthDrop.get_selected());
+      this._onDaySelected(null);
+    });
 
-    this._nextBtn = new Gtk.Button({ label: "›" });
-    this._nextBtn.add_css_class("nav-btn");
-    this._nextBtn.connect("clicked", () => this._navigate(1));
-    navBox.append(this._nextBtn);
+    this._yearDrop.connect("notify::selected", () => {
+      if (this._updatingDropdowns) {
+        return;
+      }
+      this._selectedDay = null;
+      this.setMonth(this._yearBase + this._yearDrop.get_selected(), this._viewMonth);
+      this._onDaySelected(null);
+    });
 
-    box.append(navBox);
     this.append(box);
   }
 
+  _syncDropdowns() {
+    this._updatingDropdowns = true;
+    this._monthDrop.set_selected(this._viewMonth);
+    const yearIdx = this._viewYear - this._yearBase;
+    if (yearIdx >= 0 && yearIdx < this._yearCount) {
+      this._yearDrop.set_selected(yearIdx);
+    }
+    this._updatingDropdowns = false;
+  }
+
   _buildSep() {
-    this._sep = new Gtk.Label({ label: "─".repeat(34), xalign: 0 });
+    this._sep = new Gtk.Label({ label: "─".repeat(SEP_CHAR_COUNT), xalign: 0 });
     this._sep.add_css_class("sep");
     this.append(this._sep);
   }
@@ -83,15 +121,15 @@ class CalendarGrid extends Gtk.Box {
 
   setEvents(events) {
     this._events = events;
-    if (this._viewYear !== null) this._renderCells();
+    if (this._viewYear !== null) {
+      this._renderCells();
+    }
   }
 
   setMonth(year, month) {
     this._viewYear = year;
     this._viewMonth = month;
-    const MONTHS = ["january","february","march","april","may","june",
-                    "july","august","september","october","november","december"];
-    this._monthLabel.set_label(`${MONTHS[month]} ${year}`);
+    this._syncDropdowns();
     this._renderCells();
   }
 
@@ -108,8 +146,14 @@ class CalendarGrid extends Gtk.Box {
   _navigate(dir) {
     let m = this._viewMonth + dir;
     let y = this._viewYear;
-    if (m < 0) { m = 11; y--; }
-    if (m > 11) { m = 0; y++; }
+    if (m < 0) {
+      m = 11;
+      y--;
+    }
+    if (m > 11) {
+      m = 0;
+      y++;
+    }
     this._selectedDay = null;
     this.setMonth(y, m);
     this._onDaySelected(null);
@@ -134,7 +178,9 @@ class CalendarGrid extends Gtk.Box {
     let child = this._grid.get_first_child();
     while (child) {
       const next = child.get_next_sibling();
-      if (!child.has_css_class("day-label")) toRemove.push(child);
+      if (!child.has_css_class("day-label")) {
+        toRemove.push(child);
+      }
       child = next;
     }
     toRemove.forEach(c => {
@@ -142,11 +188,15 @@ class CalendarGrid extends Gtk.Box {
       let w = c.get_first_child();
       while (w) {
         const next = w.get_next_sibling();
-        if (w instanceof Gtk.DrawingArea) w.set_draw_func(null);
+        if (w instanceof Gtk.DrawingArea) {
+          w.set_draw_func(null);
+        }
         // check grandchildren (dots box)
         let gw = w.get_first_child?.();
         while (gw) {
-          if (gw instanceof Gtk.DrawingArea) gw.set_draw_func(null);
+          if (gw instanceof Gtk.DrawingArea) {
+            gw.set_draw_func(null);
+          }
           gw = gw.get_next_sibling?.();
         }
         w = next;
@@ -163,7 +213,6 @@ class CalendarGrid extends Gtk.Box {
     const offset = firstDow === 0 ? 6 : firstDow - 1;
     const daysInMonth = new Date(y, m + 1, 0).getDate();
     const prevDays = new Date(y, m, 0).getDate();
-    const total = 42; // always 6 weeks — fixed height
 
     // build set of dates with events for fast lookup
     const eventDates = new Set();
@@ -171,23 +220,35 @@ class CalendarGrid extends Gtk.Box {
     for (const ev of this._events) {
       const date = ev.start.slice(0, 10);
       eventDates.add(date);
-      if (!eventColorMap[date]) eventColorMap[date] = [];
-      if (eventColorMap[date].length < 3) eventColorMap[date].push(ev.color);
+      if (!eventColorMap[date]) {
+        eventColorMap[date] = [];
+      }
+      if (eventColorMap[date].length < MAX_EVENT_DOTS) {
+        eventColorMap[date].push(ev.color);
+      }
     }
 
-    for (let i = 0; i < total; i++) {
+    for (let i = 0; i < GRID_TOTAL_CELLS; i++) {
       let cY = y, cM = m, cD;
       let otherMonth = false;
 
       if (i < offset) {
         cD = prevDays - offset + 1 + i;
-        cM = m - 1; if (cM < 0) { cM = 11; cY = y - 1; }
+        cM = m - 1;
+        if (cM < 0) {
+          cM = 11;
+          cY = y - 1;
+        }
         otherMonth = true;
       } else if (i - offset < daysInMonth) {
         cD = i - offset + 1;
       } else {
         cD = i - offset - daysInMonth + 1;
-        cM = m + 1; if (cM > 11) { cM = 0; cY = y + 1; }
+        cM = m + 1;
+        if (cM > 11) {
+          cM = 0;
+          cY = y + 1;
+        }
         otherMonth = true;
       }
 
@@ -201,11 +262,19 @@ class CalendarGrid extends Gtk.Box {
       const col = i % 7;
       const row = Math.floor(i / 7) + 1;
 
-      const cell = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 2, height_request: 36 });
-      if (otherMonth) cell.add_css_class("day-other");
-      if (isToday) cell.add_css_class("day-today");
-      if (isSel) cell.add_css_class("day-selected");
-      if (hasEvents) cell.add_css_class("day-has-events");
+      const cell = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 2, height_request: CELL_HEIGHT_PX });
+      if (otherMonth) {
+        cell.add_css_class("day-other");
+      }
+      if (isToday) {
+        cell.add_css_class("day-today");
+      }
+      if (isSel) {
+        cell.add_css_class("day-selected");
+      }
+      if (hasEvents) {
+        cell.add_css_class("day-has-events");
+      }
 
       const btn = new Gtk.Button({ label: String(cD) });
       btn.add_css_class("day-num");

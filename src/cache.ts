@@ -6,6 +6,8 @@ import type { EventsCache, Config } from "./types.js";
 export const CACHE_DIR = path.join(os.homedir(), ".cache", "waybar-calendar");
 export const CONFIG_DIR = path.join(os.homedir(), ".config", "waybar-calendar");
 
+export const DEFAULT_SYNC_INTERVAL_MINUTES = 15;
+
 const EVENTS_FILE = path.join(CACHE_DIR, "events.json");
 const EVENTS_TMP = path.join(CACHE_DIR, "events.json.tmp");
 const CONFIG_FILE = path.join(CONFIG_DIR, "config.json");
@@ -33,6 +35,6 @@ export function readConfig(): Config {
   try {
     return JSON.parse(fs.readFileSync(CONFIG_FILE, "utf8")) as Config;
   } catch {
-    return { credentialsPath: "", accounts: [], syncIntervalMinutes: 15 };
+    return { credentialsPath: "", accounts: [], syncIntervalMinutes: DEFAULT_SYNC_INTERVAL_MINUTES };
   }
 }

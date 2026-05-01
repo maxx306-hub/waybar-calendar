@@ -8,11 +8,15 @@ import { loadTheme, buildCss } from "./theme.js";
 const CACHE_FILE   = GLib.get_home_dir() + "/.cache/waybar-calendar/events.json";
 const PID_FILE     = GLib.get_home_dir() + "/.cache/waybar-calendar/popup.pid";
 const CSS_TEMPLATE = GLib.get_home_dir() + "/Projects/waybar-calendar/popup/style.css.template";
+const SIGUSR1 = 10;
+const KEYBOARD_GRAB_DELAY_MS = 200;
 
 function readCache() {
   try {
     const [ok, bytes] = GLib.file_get_contents(CACHE_FILE);
-    if (!ok) return null;
+    if (!ok) {
+      return null;
+    }
     return JSON.parse(new TextDecoder().decode(bytes));
   } catch {
     return null;
@@ -22,7 +26,9 @@ function readCache() {
 function applyTheme() {
   const theme = loadTheme();
   const [ok, bytes] = GLib.file_get_contents(CSS_TEMPLATE);
-  if (!ok) return;
+  if (!ok) {
+    return;
+  }
   const css = buildCss(new TextDecoder().decode(bytes), theme);
 
   if (!applyTheme._provider) {
@@ -39,6 +45,9 @@ function applyTheme() {
 const app = new Gtk.Application({ application_id: "dev.waybar.calendar" });
 
 app.connect("activate", () => {
+  // hold prevents GTK from quitting when the window is hidden (not destroyed)
+  app.hold();
+
   const win = new CalendarWindow(app);
 
   applyTheme._display = win.get_display();
@@ -47,13 +56,21 @@ app.connect("activate", () => {
   win.present();
 
   // store source IDs for cleanup
-  const signalSourceId = GLibUnix.signal_add(GLib.PRIORITY_DEFAULT, 10 /* SIGUSR1 */, () => {
+  const signalSourceId = GLibUnix.signal_add(GLib.PRIORITY_DEFAULT, SIGUSR1, () => {
     if (win.get_visible()) {
+      win.disableKeyboard();
       win.hide();
     } else {
       applyTheme();
       win.loadData(readCache());
       win.present();
+      // delay keyboard grab so pointer events reach other surfaces immediately on open
+      GLib.timeout_add(GLib.PRIORITY_DEFAULT, KEYBOARD_GRAB_DELAY_MS, () => {
+        if (win.get_visible()) {
+          win.enableKeyboard();
+        }
+        return GLib.SOURCE_REMOVE;
+      });
     }
     return GLib.SOURCE_CONTINUE;
   });
