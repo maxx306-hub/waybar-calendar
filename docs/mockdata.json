@@ -1,0 +1,171 @@
+{
+  "syncedAt": "2026-05-01T10:00:00.000Z",
+  "accounts": [
+    { "id": "personal", "email": "you@gmail.com" },
+    { "id": "work",     "email": "you@yourcompany.com" }
+  ],
+  "calendars": [
+    { "id": "personal@gmail.com",       "summary": "Personal",    "backgroundColor": "#4285F4", "accountId": "personal" },
+    { "id": "family@group.v.calendar",  "summary": "Family",      "backgroundColor": "#0F9D58", "accountId": "personal" },
+    { "id": "work@yourcompany.com",     "summary": "Work",        "backgroundColor": "#DB4437", "accountId": "work"     },
+    { "id": "team@group.v.calendar",    "summary": "Team",        "backgroundColor": "#F4B400", "accountId": "work"     },
+    { "id": "shared@group.v.calendar",  "summary": "Shared",      "backgroundColor": "#7986CB", "accountId": "work"     }
+  ],
+  "events": [
+    {
+      "id": "ev001",
+      "calendarId": "work@yourcompany.com",
+      "accountId": "work",
+      "summary": "Sprint planning",
+      "start": "2026-05-01T09:00:00+02:00",
+      "end":   "2026-05-01T10:30:00+02:00",
+      "allDay": false,
+      "color": "#DB4437",
+      "description": "Kick off sprint 23. Bring estimates for the auth refactor tickets.",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev001",
+      "meetingLink": "https://meet.google.com/abc-defg-hij"
+    },
+    {
+      "id": "ev002",
+      "calendarId": "team@group.v.calendar",
+      "accountId": "work",
+      "summary": "Design review",
+      "start": "2026-05-01T14:00:00+02:00",
+      "end":   "2026-05-01T15:00:00+02:00",
+      "allDay": false,
+      "color": "#F4B400",
+      "description": "Review updated Figma mockups for the onboarding flow.",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev002",
+      "meetingLink": "https://zoom.us/j/99887766554"
+    },
+    {
+      "id": "ev003",
+      "calendarId": "personal@gmail.com",
+      "accountId": "personal",
+      "summary": "Gym",
+      "start": "2026-05-02T07:30:00+02:00",
+      "end":   "2026-05-02T09:00:00+02:00",
+      "allDay": false,
+      "color": "#4285F4",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev003"
+    },
+    {
+      "id": "ev004",
+      "calendarId": "work@yourcompany.com",
+      "accountId": "work",
+      "summary": "1:1 with manager",
+      "start": "2026-05-04T11:00:00+02:00",
+      "end":   "2026-05-04T11:30:00+02:00",
+      "allDay": false,
+      "color": "#DB4437",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev004",
+      "meetingLink": "https://meet.google.com/xyz-uvwx-yz"
+    },
+    {
+      "id": "ev005",
+      "calendarId": "family@group.v.calendar",
+      "accountId": "personal",
+      "summary": "Mom's birthday",
+      "start": "2026-05-05",
+      "end":   "2026-05-06",
+      "allDay": true,
+      "color": "#0F9D58",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev005"
+    },
+    {
+      "id": "ev006",
+      "calendarId": "work@yourcompany.com",
+      "accountId": "work",
+      "summary": "All-hands",
+      "start": "2026-05-06T16:00:00+02:00",
+      "end":   "2026-05-06T17:00:00+02:00",
+      "allDay": false,
+      "color": "#DB4437",
+      "description": "Monthly company all-hands. CEO update + Q2 roadmap presentation.",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev006",
+      "meetingLink": "https://zoom.us/j/11223344556"
+    },
+    {
+      "id": "ev007",
+      "calendarId": "shared@group.v.calendar",
+      "accountId": "work",
+      "summary": "Team offsite",
+      "start": "2026-05-07",
+      "end":   "2026-05-09",
+      "allDay": true,
+      "color": "#7986CB",
+      "description": "Two-day offsite at the lake house. Bring laptop.",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev007"
+    },
+    {
+      "id": "ev008",
+      "calendarId": "personal@gmail.com",
+      "accountId": "personal",
+      "summary": "Dentist",
+      "start": "2026-05-08T10:00:00+02:00",
+      "end":   "2026-05-08T11:00:00+02:00",
+      "allDay": false,
+      "color": "#4285F4",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev008"
+    },
+    {
+      "id": "ev009",
+      "calendarId": "team@group.v.calendar",
+      "accountId": "work",
+      "summary": "Code review session",
+      "start": "2026-05-12T13:00:00+02:00",
+      "end":   "2026-05-12T14:00:00+02:00",
+      "allDay": false,
+      "color": "#F4B400",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev009",
+      "meetingLink": "https://meet.google.com/lmn-opqr-stu"
+    },
+    {
+      "id": "ev010",
+      "calendarId": "work@yourcompany.com",
+      "accountId": "work",
+      "summary": "Conference: UX Summit",
+      "start": "2026-05-14",
+      "end":   "2026-05-16",
+      "allDay": true,
+      "color": "#DB4437",
+      "description": "Annual UX Summit. Talk on design systems at 15:00 on day 2.",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev010"
+    },
+    {
+      "id": "ev011",
+      "calendarId": "personal@gmail.com",
+      "accountId": "personal",
+      "summary": "Flight to Barcelona",
+      "start": "2026-05-22T06:45:00+02:00",
+      "end":   "2026-05-22T09:30:00+02:00",
+      "allDay": false,
+      "color": "#4285F4",
+      "description": "Vueling VY1234. Terminal 1, Gate B12. Check-in closes 45 min before departure.",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev011"
+    },
+    {
+      "id": "ev012",
+      "calendarId": "family@group.v.calendar",
+      "accountId": "personal",
+      "summary": "Family dinner",
+      "start": "2026-05-24T19:00:00+02:00",
+      "end":   "2026-05-24T22:00:00+02:00",
+      "allDay": false,
+      "color": "#0F9D58",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev012"
+    },
+    {
+      "id": "ev013",
+      "calendarId": "team@group.v.calendar",
+      "accountId": "work",
+      "summary": "Sprint retrospective",
+      "start": "2026-05-29T10:00:00+02:00",
+      "end":   "2026-05-29T11:00:00+02:00",
+      "allDay": false,
+      "color": "#F4B400",
+      "htmlLink": "https://calendar.google.com/calendar/event?eid=ev013",
+      "meetingLink": "https://meet.google.com/ret-rosp-ect"
+    }
+  ]
+}

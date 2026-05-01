@@ -44,9 +44,17 @@ class EventsPanel extends Gtk.Box {
     this._detailCard.add_css_class("detail-card");
     this._detailCard.set_visible(false);
 
-    this._detailLabel = new Gtk.Label({ label: "── detail " + "─".repeat(20), xalign: 0 });
+    const detailHeader = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 0 });
+
+    this._detailLabel = new Gtk.Label({ label: "detail ", xalign: 0, hexpand: true });
     this._detailLabel.add_css_class("detail-label");
-    this._detailCard.append(this._detailLabel);
+    detailHeader.append(this._detailLabel);
+
+    this._detailAccount = new Gtk.Label({ label: "", xalign: 1 });
+    this._detailAccount.add_css_class("detail-label");
+    detailHeader.append(this._detailAccount);
+
+    this._detailCard.append(detailHeader);
 
     const top = new Gtk.Box({ orientation: Gtk.Orientation.HORIZONTAL, spacing: 8 });
     this._detailDot = new Gtk.DrawingArea({ width_request: 5, height_request: 5, valign: Gtk.Align.CENTER });
@@ -63,7 +71,7 @@ class EventsPanel extends Gtk.Box {
     top.append(this._detailName);
     this._detailCard.append(top);
 
-    this._detailBody = new Gtk.Label({ label: "", xalign: 0, wrap: true });
+    this._detailBody = new Gtk.Label({ label: "", xalign: 0, wrap: true, max_width_chars: 1 });
     this._detailBody.add_css_class("detail-body");
     this._detailCard.append(this._detailBody);
 
@@ -95,8 +103,12 @@ class EventsPanel extends Gtk.Box {
     this.append(this._detailCard);
   }
 
-  setEvents(events) {
+  setEvents(events, accounts = []) {
     this._events = events;
+    this._accountEmail = {};
+    for (const a of accounts) {
+      this._accountEmail[a.id] = a.email;
+    }
     this._activeEventId = null;
     this._render();
   }
@@ -215,6 +227,7 @@ class EventsPanel extends Gtk.Box {
     this._detailColor = ev.color;
     this._detailDot.queue_draw();
     this._detailName.set_label(ev.summary);
+    this._detailAccount.set_label(this._accountEmail?.[ev.accountId] ?? ev.accountId);
 
     const time = formatTime(ev.start, ev.allDay);
     const desc = ev.description ? `${time}  ·  ${ev.description}` : time;
