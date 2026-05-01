@@ -1,0 +1,207 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+window {
+  background: transparent;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  color: {{text}};
+}
+
+.widget {
+  background: {{bg}};
+  border: 1px solid {{border}};
+}
+
+/* ── Left panel ── */
+
+.cal-panel {
+  padding: 20px 16px 14px;
+  border-right: 1px solid {{border}};
+}
+
+.cal-header {
+  /* flex handled by GTK box */
+}
+
+.cal-month {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: {{bright}};
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  min-width: 24px;
+  min-height: 24px;
+  padding: 0;
+  font-size: 14px;
+  font-family: "JetBrains Mono", monospace;
+  color: {{dim}};
+}
+
+.nav-btn:hover {
+  color: {{accent}};
+  background: none;
+  box-shadow: none;
+}
+
+.sep {
+  font-size: 11px;
+  color: {{border}};
+}
+
+.day-label {
+  font-size: 11px;
+  color: {{muted}};
+  letter-spacing: 0.06em;
+}
+
+.day-num {
+  font-size: 13px;
+  color: {{text}};
+  min-width: 30px;
+  min-height: 26px;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 0;
+}
+
+.day-num:hover {
+  background: none;
+  box-shadow: none;
+}
+
+.day-other .day-num {
+  color: {{border}};
+}
+
+.day-today .day-num {
+  background: {{accent}};
+  color: {{accent_fg}};
+  font-weight: 600;
+}
+
+.day-today .day-num:hover {
+  background: {{accent}};
+}
+
+.day-selected:not(.day-today) .day-num {
+  color: {{accent}};
+  border: 1px solid {{accent}};
+}
+
+.day-cell:not(.day-other):hover .day-num {
+  color: {{accent}};
+}
+
+/* nav hints */
+
+.nav-hints {
+  border-top: 1px solid {{border}};
+  padding-top: 8px;
+}
+
+.hint {
+  font-size: 11px;
+  color: {{muted}};
+}
+
+.hint-key {
+  font-size: 12px;
+  color: {{dim}};
+}
+
+/* ── Right panel ── */
+
+.events-panel {
+  padding: 20px 14px 14px;
+}
+
+.events-title {
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: {{bright}};
+}
+
+.event-row {
+  padding: 6px 6px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.event-row:hover {
+  background: transparent;
+  box-shadow: none;
+}
+
+.event-prefix {
+  font-size: 12px;
+  color: {{dim}};
+}
+
+.event-row:hover .event-prefix,
+.event-row.active .event-prefix {
+  color: {{accent}};
+}
+
+.event-title {
+  font-size: 13px;
+  color: {{text}};
+}
+
+.event-time {
+  font-size: 12px;
+  color: {{dim}};
+}
+
+/* detail card */
+
+.detail-card {
+  border-top: 1px solid {{border}};
+  padding: 10px 12px;
+}
+
+.detail-label {
+  font-size: 10px;
+  color: {{border}};
+}
+
+.detail-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: {{bright}};
+}
+
+.detail-body {
+  font-size: 12px;
+  color: {{dim}};
+}
+
+.detail-link {
+  font-size: 12px;
+  color: {{accent}};
+  text-decoration: underline;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.detail-link:hover {
+  color: {{accent}};
+  background: none;
+  box-shadow: none;
+  opacity: 0.75;
+}
+
+.no-events {
+  font-size: 13px;
+  color: {{muted}};
+}
