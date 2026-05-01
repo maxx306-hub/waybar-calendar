@@ -49,7 +49,7 @@ waybar-calendar/
 Terminal aesthetic — transparent background, no rounded corners, JetBrains Mono, ASCII decorators.
 
 ```
-┌────────────────────────────────────────────────────────┐
+┌─────────────────────────────────────────────────────────┐
 │ JANUARY 2026          ‹ ›  │  upcoming                  │
 │ ────────────────────────── │                            │
 │ mo tu we th fr  sa su      │  › ● Sprint planning 09:00 │
@@ -59,9 +59,9 @@ Terminal aesthetic — transparent background, no rounded corners, JetBrains Mon
 │ 20 21 22 23 24  25 26      │                            │
 │ 27 28 29 30 31             │  ── detail ────────────    │
 │                            │  ● Sprint planning         │
-│ ⇄ month  ⇅ year  ↵ reset  │  09:00 · Kick off sprint   │
+│ ⇄ month  ⇅ year  ↵ reset   │  09:00 · Kick off sprint   │
 │                            │  ↗ open link               │
-└────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────┘
   300px fixed                  320px flex
 ```
 
