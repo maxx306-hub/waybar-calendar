@@ -4,9 +4,9 @@ A GTK4 calendar popup for [Waybar](https://github.com/Alexays/Waybar) with Googl
 
 ## Screenshots 
 
-![Waybar clock](https://github.com/user-attachments/assets/2cbfed57-b9ba-490c-9ea0-37e2b00ffbe3)
+![Waybar clock](docs/screenshot-bar.png)
 
-![Calendar popup](https://github.com/user-attachments/assets/50f4c9d7-7d3c-4bc4-9b50-d85d6a6d6035)
+![Calendar popup](docs/screenshot-popup.png)
 
 ## Features
 
