@@ -48,6 +48,11 @@ async function sync(): Promise<void> {
     }
   }
 
+  if (accountMetas.length === 0) {
+    console.error("[sync] All accounts failed. Keeping existing cache.");
+    throw new Error("All accounts failed");
+  }
+
   const cache: EventsCache = {
     syncedAt: new Date().toISOString(),
     accounts: accountMetas,

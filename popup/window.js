@@ -106,6 +106,6 @@ class CalendarWindow extends Gtk.ApplicationWindow {
       return;
     }
     this._calGrid.setEvents(cache.events);
-    this._eventsPanel.setEvents(cache.events, cache.accounts);
+    this._eventsPanel.setEvents(cache.events, cache.accounts, cache.syncedAt);
   }
 });

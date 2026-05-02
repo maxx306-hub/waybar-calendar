@@ -4,7 +4,7 @@ import GLib from "gi://GLib";
 
 const DAY_NAMES = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
 const MONTH_NAMES = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
-const UPCOMING_EVENT_COUNT = 4;
+const UPCOMING_DAYS = 14;
 
 export const EventsPanel = GObject.registerClass(
 class EventsPanel extends Gtk.Box {
@@ -101,14 +101,19 @@ class EventsPanel extends Gtk.Box {
     this._detailCard.append(linksBox);
 
     this.append(this._detailCard);
+
+    this._syncedLabel = new Gtk.Label({ label: "", xalign: 1 });
+    this._syncedLabel.add_css_class("detail-label");
+    this.append(this._syncedLabel);
   }
 
-  setEvents(events, accounts = []) {
+  setEvents(events, accounts = [], syncedAt = null) {
     this._events = events;
     this._accountEmail = {};
     for (const a of accounts) {
       this._accountEmail[a.id] = a.email;
     }
+    this._syncedLabel.set_label(syncedAt ? formatSyncedAt(syncedAt) : "");
     this._activeEventId = null;
     this._render();
   }
@@ -154,10 +159,12 @@ class EventsPanel extends Gtk.Box {
       this._title.set_label(formatDayLabel(year, month, day));
     } else {
       const todayIso = isoDate(...todayParts());
+      const limitDate = new Date();
+      limitDate.setDate(limitDate.getDate() + UPCOMING_DAYS);
+      const limitIso = isoDate(limitDate.getFullYear(), limitDate.getMonth(), limitDate.getDate());
       events = this._events
-        .filter(e => e.start.slice(0, 10) >= todayIso)
-        .sort((a, b) => a.start.localeCompare(b.start))
-        .slice(0, UPCOMING_EVENT_COUNT);
+        .filter(e => e.start.slice(0, 10) >= todayIso && e.start.slice(0, 10) <= limitIso)
+        .sort((a, b) => a.start.localeCompare(b.start));
       this._title.set_label("upcoming");
     }
 
@@ -280,4 +287,15 @@ function formatTime(isoStart, allDay) {
   }
   const d = new Date(isoStart);
   return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
+function formatSyncedAt(iso) {
+  const d = new Date(iso);
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  const hours = d.getHours();
+  const minutes = String(d.getMinutes()).padStart(2, "0");
+  const ampm = hours >= 12 ? "pm" : "am";
+  const h12 = String(hours % 12 || 12);
+  return `synced ${month}/${day} ${h12}:${minutes} ${ampm}`;
 }
